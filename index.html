@@ -75,6 +75,10 @@
             </div>
         </section>
 
+        <section id="spinner" class="w-10/12 mx-auto p-8 rounded-b-lg mt-2 bg-[#fbfbfb] flex justify-center items-center h-[60vh] hidden">
+            <span class="loading loading-spinner loading-xl"></span>
+        </section>
+
         <!-- issue container -->
         <section id="issue-container" class="w-10/12 mx-auto p-8 rounded-b-lg mt-2 bg-[#fbfbfb] grid grid-cols-4 gap-4">
             <!-- single card -->
@@ -98,27 +102,6 @@
         </section>
     </main>
 
-
-    <!-- for modal -->
-    <!-- <div class="p-5 space-y-4">
-        <h3 class="text-2xl font-semibold">title</h3>
-        <div><span class="bg-green-400 text-white px-3 py-1 rounded-2xl">status</span> . <span
-                class="text-[#64748B]">author</span> . <span class="text-[#64748B]">date</span></div>
-        <div>levels</div>
-        <p class="text-[#64748B]">description</p>
-        <div class="bg-[#fbfbfb] p-4 rounded-xl flex justify-between">
-            <div class="l-div">
-                <p class="text-[#64748B]">Assignee:</p>
-                <p>author</p>
-            </div>
-            <div class="r-div">
-                <p class="text-[#64748B]">Priority:</p>
-                <p class="bg-red-400 text-white px-3 py-1 rounded-2xl">priority</p>
-            </div>
-        </div>
-    </div> -->
-
-
     <!-- Open the modal using ID.showModal() method -->
     <!-- <button class="btn" onclick="my_modal_5.showModal()">open modal</button> -->
     <dialog id="issue_modal" class="modal modal-bottom sm:modal-middle">
@@ -134,8 +117,6 @@
             </div>
         </div>
     </dialog>
-
-
 
 
     <script src="./Js/script.js"></script>

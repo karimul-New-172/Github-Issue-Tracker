@@ -9,12 +9,23 @@ const issueContainer = document.getElementById('issue-container');
 
 //count array
 const openCount = [];
-const closeCount =  [];
+const closeCount = [];
 
 // reusable function for create element for an array
 const createElement = (arr) => {
     const htmlElements = arr.map(el => `<span class="bg-yellow-400 rounded-2xl px-3 py-1">${el}</span>`);
     return htmlElements.join(' ');
+}
+
+// reusable function for spinner
+function showSpinner() {
+    document.getElementById('issue-container').classList.add('hidden');
+    document.getElementById('spinner').classList.remove('hidden');
+}
+
+const hideSpinner = () => {
+    document.getElementById('spinner').classList.add('hidden');
+    document.getElementById('issue-container').classList.remove('hidden');
 }
 
 // for modal function
@@ -52,7 +63,8 @@ const displayIssueDetails = (data) => {
     document.getElementById('issue_modal').showModal();
 }
 
-const loadAllData = async() => {
+const loadAllData = async () => {
+    showSpinner();
     const res = await fetch('https://phi-lab-server.vercel.app/api/v1/lab/issues');
     const jsonData = await res.json();
     displayAllData(jsonData.data);
@@ -60,17 +72,17 @@ const loadAllData = async() => {
 
 const displayAllData = (issues) => {
     issueContainer.innerHTML = "";
-        issueCount.innerText = issues.length;
-        issues.forEach(issue => {
-            const issueDiv = document.createElement('div');
-            issueDiv.className = 'card max-w-96 p-5 bg-white shadow-lg rounded-lg space-y-5';
-            issueDiv.onclick = () => loadIssueDetails(issue.id);
-            if (issue.status === "open") {
-                issueDiv.classList.add('border-t-4', 'border-green-500');
-            } else {
-                issueDiv.classList.add('border-t-4', 'border-purple-500');
-            }
-            issueDiv.innerHTML = `
+    issueCount.innerText = issues.length;
+    issues.forEach(issue => {
+        const issueDiv = document.createElement('div');
+        issueDiv.className = 'card max-w-96 p-5 bg-white shadow-lg rounded-lg space-y-5';
+        issueDiv.onclick = () => loadIssueDetails(issue.id);
+        if (issue.status === "open") {
+            issueDiv.classList.add('border-t-4', 'border-green-500');
+        } else {
+            issueDiv.classList.add('border-t-4', 'border-purple-500');
+        }
+        issueDiv.innerHTML = `
                 <div  class="flex justify-between items-center">
                     <img src="./assets/Open-Status.png" alt="">
                     <span class="bg-red-200 text-red-500 px-6 py-1 rounded-2xl">${issue.priority}</span>
@@ -82,8 +94,9 @@ const displayAllData = (issues) => {
                 <p class="text-[#64748B]">#1 by ${issue.author}</p>
                 <p class="text-[#64748B]">${new Date(issue.createdAt).toLocaleDateString('en-US')}</p>
             `
-            issueContainer.appendChild(issueDiv);
-        })
+        issueContainer.appendChild(issueDiv);
+    })
+    hideSpinner();
 }
 
 loadAllData();
@@ -98,6 +111,7 @@ allBtn.addEventListener('click', () => {
     })
 
     const loadAllIssues = async () => {
+        showSpinner();
         const res = await fetch('https://phi-lab-server.vercel.app/api/v1/lab/issues');
         const jsonData = await res.json();
         displayIssue(jsonData.data);
@@ -128,6 +142,7 @@ allBtn.addEventListener('click', () => {
             `
             issueContainer.appendChild(issueDiv);
         })
+        hideSpinner();
     }
     loadAllIssues();
 })
@@ -142,6 +157,7 @@ openBtn.addEventListener('click', () => {
     })
 
     const loadAllIssues = async () => {
+        showSpinner();
         const res = await fetch('https://phi-lab-server.vercel.app/api/v1/lab/issues');
         const jsonData = await res.json();
         displayCards(jsonData.data);
@@ -169,9 +185,10 @@ openBtn.addEventListener('click', () => {
                 <p class="text-[#64748B]">#1 by ${issue.author}</p>
                 <p class="text-[#64748B]">${new Date(issue.createdAt).toLocaleDateString('en-US')}</p>
             `
-            issueContainer.appendChild(issueDiv);
+                issueContainer.appendChild(issueDiv);
             }
         })
+        hideSpinner();
     }
     loadAllIssues();
 })
@@ -186,6 +203,7 @@ closeBtn.addEventListener('click', () => {
     })
 
     const loadAllIssues = async () => {
+        showSpinner();
         const res = await fetch('https://phi-lab-server.vercel.app/api/v1/lab/issues');
         const jsonData = await res.json();
         displayCards(jsonData.data);
@@ -213,11 +231,12 @@ closeBtn.addEventListener('click', () => {
                 <p class="text-[#64748B]">#1 by ${issue.author}</p>
                 <p class="text-[#64748B]">${new Date(issue.createdAt).toLocaleDateString('en-US')}</p>
             `
-            issueContainer.appendChild(issueDiv);
+                issueContainer.appendChild(issueDiv);
             }
         })
+        hideSpinner();
     }
     loadAllIssues();
-    
+
 })
 
