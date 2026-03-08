@@ -7,8 +7,9 @@ const issueCount = document.getElementById('issue-count');
 
 const cardContainer = document.getElementById('card-container');
 
-// open count array
-const openCount = []
+//count array
+const openCount = [];
+const closeCount =  [];
 
 // reusable function for create element for an array
 const createElement = (arr) => {
@@ -153,6 +154,7 @@ openBtn.addEventListener('click', () => {
     loadAllIssues();
 })
 
+// for close btn
 closeBtn.addEventListener('click', () => {
     allBtns.forEach(btn => {
         btn.classList.remove('btn-primary', 'text-white');
@@ -160,5 +162,40 @@ closeBtn.addEventListener('click', () => {
         closeBtn.classList.remove('btn-soft', 'text-[#64748B]');
         closeBtn.classList.add('btn-primary', 'text-white');
     })
+
+    const loadAllIssues = async () => {
+        const res = await fetch('https://phi-lab-server.vercel.app/api/v1/lab/issues');
+        const jsonData = await res.json();
+        displayCards(jsonData.data);
+    }
+
+    const displayCards = (issues) => {
+        cardContainer.innerHTML = "";
+        issues.forEach(issue => {
+            if (issue.status === 'closed') {
+                closeCount.push(issue);
+                issueCount.innerText = closeCount.length;
+                const issueDiv = document.createElement('div');
+                issueDiv.className = 'card max-w-96 p-5 bg-white shadow-lg rounded-lg border-t-4 border-purple-500 space-y-5';
+                issueDiv.onclick = () => loadIssueDetails(issue.id);
+
+                issueDiv.innerHTML = `
+                <div  class="flex justify-between items-center">
+                    <img src="./assets/Open-Status.png" alt="">
+                    <span class="bg-red-200 text-red-500 px-6 py-1 rounded-2xl">${issue.priority}</span>
+                </div>
+                <h3 class="text-2xl font-semibold">${issue.title}</h3>
+                <p class="text-[#64748B]">${issue.description}</p>
+                <div class="space-x-2">${createElement(issue.labels)}</div>
+                <div class="border border-gray-100"></div>
+                <p class="text-[#64748B]">#1 by ${issue.author}</p>
+                <p class="text-[#64748B]">${new Date(issue.createdAt).toLocaleDateString('en-US')}</p>
+            `
+            cardContainer.appendChild(issueDiv);
+            }
+        })
+    }
+    loadAllIssues();
+    
 })
 
