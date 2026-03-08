@@ -22,6 +22,41 @@ allBtn.addEventListener('click', () => {
         allBtn.classList.add('btn-primary', 'text-white');
     })
 
+    // for modal function
+    const loadIssueDetails = (id) => {
+        // console.log(id);
+        fetch(`https://phi-lab-server.vercel.app/api/v1/lab/issue/${id}`)
+            .then(res => res.json())
+            .then(data => displayIssueDetails(data.data))
+    }
+
+    const displayIssueDetails = (data) => {
+        const detailsContainer = document.getElementById('details-container');
+        detailsContainer.innerHTML = `
+            <h3 class="text-2xl font-semibold">${data.title}</h3>
+            <div>
+                <span class="bg-green-400 text-white px-3 py-1 rounded-2xl">${data.status}</span>
+                 . 
+                <span class="text-[#64748B]">${data.author}</span>
+                 . 
+                <span class="text-[#64748B]">${new Date(data.createdAt).toLocaleDateString('en-US')}</span>
+            </div>
+            <div>${createElement(data.labels)}</div>
+            <p class="text-[#64748B]">${data.description}</p>
+            <div class="bg-[#fbfbfb] p-4 rounded-xl flex justify-between">
+                <div class="l-div">
+                    <p class="text-[#64748B]">Assignee:</p>
+                    <p>${data.author}</p>
+                </div>
+                <div class="r-div">
+                    <p class="text-[#64748B]">Priority:</p>
+                    <p class="bg-red-400 text-white px-3 py-1 rounded-2xl">${data.priority}</p>
+                </div>
+            </div>
+        `
+        document.getElementById('issue_modal').showModal();
+    }
+
     const loadAllCards = async () => {
         const res = await fetch('https://phi-lab-server.vercel.app/api/v1/lab/issues');
         const jsonData = await res.json();
@@ -48,13 +83,14 @@ allBtn.addEventListener('click', () => {
             // console.log(card);
             const cardDiv = document.createElement('div');
             cardDiv.className = 'card max-w-96 p-5 bg-white shadow-lg rounded-lg space-y-5';
-            if(card.status === "open"){
+            cardDiv.onclick = () => loadIssueDetails(card.id);
+            if (card.status === "open") {
                 cardDiv.classList.add('border-t-4', 'border-green-500');
-            }else {
-               cardDiv.classList.add('border-t-4', 'border-purple-500'); 
+            } else {
+                cardDiv.classList.add('border-t-4', 'border-purple-500');
             }
             cardDiv.innerHTML = `
-                <div class="flex justify-between items-center">
+                <div  class="flex justify-between items-center">
                     <img src="./assets/Open-Status.png" alt="">
                     <span class="bg-red-200 text-red-500 px-6 py-1 rounded-2xl">${card.priority}</span>
                 </div>
