@@ -7,32 +7,26 @@ const issueCount = document.getElementById('issue-count');
 
 const cardContainer = document.getElementById('card-container');
 
+// open count array
+const openCount = []
+
 // reusable function for create element for an array
 const createElement = (arr) => {
     const htmlElements = arr.map(el => `<span class="bg-yellow-400 rounded-2xl px-3 py-1">${el}</span>`);
     return htmlElements.join(' ');
 }
 
-// for btn togglink
-allBtn.addEventListener('click', () => {
-    allBtns.forEach(btn => {
-        btn.classList.remove('btn-primary', 'text-white');
-        btn.classList.add('btn-soft', 'text-[#64748B]');
-        allBtn.classList.remove('btn-soft', 'text-[#64748B]');
-        allBtn.classList.add('btn-primary', 'text-white');
-    })
+// for modal function
+const loadIssueDetails = (id) => {
+    // console.log(id);
+    fetch(`https://phi-lab-server.vercel.app/api/v1/lab/issue/${id}`)
+        .then(res => res.json())
+        .then(data => displayIssueDetails(data.data))
+}
 
-    // for modal function
-    const loadIssueDetails = (id) => {
-        // console.log(id);
-        fetch(`https://phi-lab-server.vercel.app/api/v1/lab/issue/${id}`)
-            .then(res => res.json())
-            .then(data => displayIssueDetails(data.data))
-    }
-
-    const displayIssueDetails = (data) => {
-        const detailsContainer = document.getElementById('details-container');
-        detailsContainer.innerHTML = `
+const displayIssueDetails = (data) => {
+    const detailsContainer = document.getElementById('details-container');
+    detailsContainer.innerHTML = `
             <h3 class="text-2xl font-semibold">${data.title}</h3>
             <div>
                 <span class="bg-green-400 text-white px-3 py-1 rounded-2xl">${data.status}</span>
@@ -54,8 +48,17 @@ allBtn.addEventListener('click', () => {
                 </div>
             </div>
         `
-        document.getElementById('issue_modal').showModal();
-    }
+    document.getElementById('issue_modal').showModal();
+}
+
+// for btn togglink
+allBtn.addEventListener('click', () => {
+    allBtns.forEach(btn => {
+        btn.classList.remove('btn-primary', 'text-white');
+        btn.classList.add('btn-soft', 'text-[#64748B]');
+        allBtn.classList.remove('btn-soft', 'text-[#64748B]');
+        allBtn.classList.add('btn-primary', 'text-white');
+    })
 
     const loadAllCards = async () => {
         const res = await fetch('https://phi-lab-server.vercel.app/api/v1/lab/issues');
@@ -63,6 +66,7 @@ allBtn.addEventListener('click', () => {
         displayCards(jsonData.data);
     }
     const displayCards = (cards) => {
+        cardContainer.innerHTML = "";
         issueCount.innerText = cards.length;
         // {
         // "id": 45,
@@ -78,9 +82,7 @@ allBtn.addEventListener('click', () => {
         // "createdAt": "2024-01-24T13:45:00Z",
         // "updatedAt": "2024-01-24T13:45:00Z"
         // }
-        cardContainer.innerHTML = "";
         cards.forEach(card => {
-            // console.log(card);
             const cardDiv = document.createElement('div');
             cardDiv.className = 'card max-w-96 p-5 bg-white shadow-lg rounded-lg space-y-5';
             cardDiv.onclick = () => loadIssueDetails(card.id);
@@ -107,6 +109,7 @@ allBtn.addEventListener('click', () => {
     loadAllCards();
 })
 
+// for open btn click
 openBtn.addEventListener('click', () => {
     allBtns.forEach(btn => {
         btn.classList.remove('btn-primary', 'text-white');
@@ -114,6 +117,40 @@ openBtn.addEventListener('click', () => {
         openBtn.classList.remove('btn-soft', 'text-[#64748B]');
         openBtn.classList.add('btn-primary', 'text-white');
     })
+
+    const loadAllIssues = async () => {
+        const res = await fetch('https://phi-lab-server.vercel.app/api/v1/lab/issues');
+        const jsonData = await res.json();
+        displayCards(jsonData.data);
+    }
+
+    const displayCards = (issues) => {
+        cardContainer.innerHTML = "";
+        issues.forEach(issue => {
+            if (issue.status === 'open') {
+                openCount.push(issue);
+                issueCount.innerText = openCount.length;
+                const issueDiv = document.createElement('div');
+                issueDiv.className = 'card max-w-96 p-5 bg-white shadow-lg rounded-lg border-t-4 border-green-500 space-y-5';
+                issueDiv.onclick = () => loadIssueDetails(issue.id);
+
+                issueDiv.innerHTML = `
+                <div  class="flex justify-between items-center">
+                    <img src="./assets/Open-Status.png" alt="">
+                    <span class="bg-red-200 text-red-500 px-6 py-1 rounded-2xl">${issue.priority}</span>
+                </div>
+                <h3 class="text-2xl font-semibold">${issue.title}</h3>
+                <p class="text-[#64748B]">${issue.description}</p>
+                <div class="space-x-2">${createElement(issue.labels)}</div>
+                <div class="border border-gray-100"></div>
+                <p class="text-[#64748B]">#1 by ${issue.author}</p>
+                <p class="text-[#64748B]">${new Date(issue.createdAt).toLocaleDateString('en-US')}</p>
+            `
+            cardContainer.appendChild(issueDiv);
+            }
+        })
+    }
+    loadAllIssues();
 })
 
 closeBtn.addEventListener('click', () => {
