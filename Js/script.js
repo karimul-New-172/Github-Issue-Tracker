@@ -5,7 +5,7 @@ const closeBtn = document.getElementById('btn-close');
 
 const issueCount = document.getElementById('issue-count');
 
-const cardContainer = document.getElementById('card-container');
+const issueContainer = document.getElementById('issue-container');
 
 //count array
 const openCount = [];
@@ -41,7 +41,7 @@ const displayIssueDetails = (data) => {
             <div class="bg-[#fbfbfb] p-4 rounded-xl flex justify-between">
                 <div class="l-div">
                     <p class="text-[#64748B]">Assignee:</p>
-                    <p>${data.author}</p>
+                    <p class="text-xl font-semibold">${data.author}</p>
                 </div>
                 <div class="r-div">
                     <p class="text-[#64748B]">Priority:</p>
@@ -52,6 +52,42 @@ const displayIssueDetails = (data) => {
     document.getElementById('issue_modal').showModal();
 }
 
+const loadAllData = async() => {
+    const res = await fetch('https://phi-lab-server.vercel.app/api/v1/lab/issues');
+    const jsonData = await res.json();
+    displayAllData(jsonData.data);
+}
+
+const displayAllData = (issues) => {
+    issueContainer.innerHTML = "";
+        issueCount.innerText = issues.length;
+        issues.forEach(issue => {
+            const issueDiv = document.createElement('div');
+            issueDiv.className = 'card max-w-96 p-5 bg-white shadow-lg rounded-lg space-y-5';
+            issueDiv.onclick = () => loadIssueDetails(issue.id);
+            if (issue.status === "open") {
+                issueDiv.classList.add('border-t-4', 'border-green-500');
+            } else {
+                issueDiv.classList.add('border-t-4', 'border-purple-500');
+            }
+            issueDiv.innerHTML = `
+                <div  class="flex justify-between items-center">
+                    <img src="./assets/Open-Status.png" alt="">
+                    <span class="bg-red-200 text-red-500 px-6 py-1 rounded-2xl">${issue.priority}</span>
+                </div>
+                <h3 class="text-2xl font-semibold">${issue.title}</h3>
+                <p class="text-[#64748B]">${issue.description}</p>
+                <div class="space-x-2">${createElement(issue.labels)}</div>
+                <div class="border border-gray-100"></div>
+                <p class="text-[#64748B]">#1 by ${issue.author}</p>
+                <p class="text-[#64748B]">${new Date(issue.createdAt).toLocaleDateString('en-US')}</p>
+            `
+            issueContainer.appendChild(issueDiv);
+        })
+}
+
+loadAllData();
+
 // for btn togglink
 allBtn.addEventListener('click', () => {
     allBtns.forEach(btn => {
@@ -61,53 +97,39 @@ allBtn.addEventListener('click', () => {
         allBtn.classList.add('btn-primary', 'text-white');
     })
 
-    const loadAllCards = async () => {
+    const loadAllIssues = async () => {
         const res = await fetch('https://phi-lab-server.vercel.app/api/v1/lab/issues');
         const jsonData = await res.json();
-        displayCards(jsonData.data);
+        displayIssue(jsonData.data);
     }
-    const displayCards = (cards) => {
-        cardContainer.innerHTML = "";
-        issueCount.innerText = cards.length;
-        // {
-        // "id": 45,
-        // "title": "Search results pagination broken",
-        // "description": "Pagination controls don't work on search results page. Only first page is accessible.",
-        // "status": "open",
-        // "labels": [
-        //     "bug"
-        // ],
-        // "priority": "medium",
-        // "author": "page_paul",
-        // "assignee": "emma_ui",
-        // "createdAt": "2024-01-24T13:45:00Z",
-        // "updatedAt": "2024-01-24T13:45:00Z"
-        // }
-        cards.forEach(card => {
-            const cardDiv = document.createElement('div');
-            cardDiv.className = 'card max-w-96 p-5 bg-white shadow-lg rounded-lg space-y-5';
-            cardDiv.onclick = () => loadIssueDetails(card.id);
-            if (card.status === "open") {
-                cardDiv.classList.add('border-t-4', 'border-green-500');
+    const displayIssue = (issues) => {
+        issueContainer.innerHTML = "";
+        issueCount.innerText = issues.length;
+        issues.forEach(issue => {
+            const issueDiv = document.createElement('div');
+            issueDiv.className = 'card max-w-96 p-5 bg-white shadow-lg rounded-lg space-y-5';
+            issueDiv.onclick = () => loadIssueDetails(issue.id);
+            if (issue.status === "open") {
+                issueDiv.classList.add('border-t-4', 'border-green-500');
             } else {
-                cardDiv.classList.add('border-t-4', 'border-purple-500');
+                issueDiv.classList.add('border-t-4', 'border-purple-500');
             }
-            cardDiv.innerHTML = `
+            issueDiv.innerHTML = `
                 <div  class="flex justify-between items-center">
                     <img src="./assets/Open-Status.png" alt="">
-                    <span class="bg-red-200 text-red-500 px-6 py-1 rounded-2xl">${card.priority}</span>
+                    <span class="bg-red-200 text-red-500 px-6 py-1 rounded-2xl">${issue.priority}</span>
                 </div>
-                <h3 class="text-2xl font-semibold">${card.title}</h3>
-                <p class="text-[#64748B]">${card.description}</p>
-                <div class="space-x-2">${createElement(card.labels)}</div>
+                <h3 class="text-2xl font-semibold">${issue.title}</h3>
+                <p class="text-[#64748B]">${issue.description}</p>
+                <div class="space-x-2">${createElement(issue.labels)}</div>
                 <div class="border border-gray-100"></div>
-                <p class="text-[#64748B]">#1 by ${card.author}</p>
-                <p class="text-[#64748B]">${new Date(card.createdAt).toLocaleDateString('en-US')}</p>
+                <p class="text-[#64748B]">#1 by ${issue.author}</p>
+                <p class="text-[#64748B]">${new Date(issue.createdAt).toLocaleDateString('en-US')}</p>
             `
-            cardContainer.appendChild(cardDiv);
+            issueContainer.appendChild(issueDiv);
         })
     }
-    loadAllCards();
+    loadAllIssues();
 })
 
 // for open btn click
@@ -126,7 +148,7 @@ openBtn.addEventListener('click', () => {
     }
 
     const displayCards = (issues) => {
-        cardContainer.innerHTML = "";
+        issueContainer.innerHTML = "";
         issues.forEach(issue => {
             if (issue.status === 'open') {
                 openCount.push(issue);
@@ -147,7 +169,7 @@ openBtn.addEventListener('click', () => {
                 <p class="text-[#64748B]">#1 by ${issue.author}</p>
                 <p class="text-[#64748B]">${new Date(issue.createdAt).toLocaleDateString('en-US')}</p>
             `
-            cardContainer.appendChild(issueDiv);
+            issueContainer.appendChild(issueDiv);
             }
         })
     }
@@ -170,7 +192,7 @@ closeBtn.addEventListener('click', () => {
     }
 
     const displayCards = (issues) => {
-        cardContainer.innerHTML = "";
+        issueContainer.innerHTML = "";
         issues.forEach(issue => {
             if (issue.status === 'closed') {
                 closeCount.push(issue);
@@ -191,7 +213,7 @@ closeBtn.addEventListener('click', () => {
                 <p class="text-[#64748B]">#1 by ${issue.author}</p>
                 <p class="text-[#64748B]">${new Date(issue.createdAt).toLocaleDateString('en-US')}</p>
             `
-            cardContainer.appendChild(issueDiv);
+            issueContainer.appendChild(issueDiv);
             }
         })
     }
