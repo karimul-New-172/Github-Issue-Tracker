@@ -258,7 +258,7 @@ document.getElementById('btn-search').addEventListener('click', () => {
         .then(res => res.json())
         .then(issues => {
             const allSearchIssue = issues.data;
-            const filterIssues = allSearchIssue.filter(issue => issue.description.toLowerCase().includes(searchValue));
+            const filterIssues = allSearchIssue.filter(issue => issue.title.toLowerCase().includes(searchValue));
             displaySearchIssue(filterIssues);
         });
     const displaySearchIssue = (issues) => {
