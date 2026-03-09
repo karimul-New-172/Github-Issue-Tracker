@@ -167,7 +167,10 @@ openBtn.addEventListener('click', () => {
         issueContainer.innerHTML = "";
         issues.forEach(issue => {
             if (issue.status === 'open') {
-                openCount.push(issue);
+                const isExist = openCount.find(item => item.id === issue.id);
+                if (!isExist) {
+                    openCount.push(issue);
+                }
                 issueCount.innerText = openCount.length;
                 const issueDiv = document.createElement('div');
                 issueDiv.className = 'card max-w-96 p-5 bg-white shadow-lg rounded-lg border-t-4 border-green-500 space-y-5';
@@ -213,7 +216,10 @@ closeBtn.addEventListener('click', () => {
         issueContainer.innerHTML = "";
         issues.forEach(issue => {
             if (issue.status === 'closed') {
-                closeCount.push(issue);
+                const isExist = closeCount.find(item => item.id === issue.id);
+                if (!isExist) {
+                    closeCount.push(issue);
+                }
                 issueCount.innerText = closeCount.length;
                 const issueDiv = document.createElement('div');
                 issueDiv.className = 'card max-w-96 p-5 bg-white shadow-lg rounded-lg border-t-4 border-purple-500 space-y-5';
@@ -240,3 +246,47 @@ closeBtn.addEventListener('click', () => {
 
 })
 
+
+
+// for search issue functionality
+document.getElementById('btn-search').addEventListener('click', () => {
+    const searchInput = document.getElementById('search-input');
+    const searchValue = searchInput.value.trim().toLowerCase();
+    // console.log(searchValue);
+    showSpinner();
+    fetch(`https://phi-lab-server.vercel.app/api/v1/lab/issues/search?q=${searchValue}`)
+        .then(res => res.json())
+        .then(issues => {
+            const allSearchIssue = issues.data;
+            const filterIssues = allSearchIssue.filter(issue => issue.description.toLowerCase().includes(searchValue));
+            displaySearchIssue(filterIssues);
+        });
+    const displaySearchIssue = (issues) => {
+        issueContainer.innerHTML = "";
+        issueCount.innerText = issues.length;
+        for (const issue of issues) {
+            const issueDiv = document.createElement('div');
+            issueDiv.className = 'card max-w-96 p-5 bg-white shadow-lg rounded-lg space-y-5';
+            issueDiv.onclick = () => loadIssueDetails(issue.id);
+            if (issue.status === "open") {
+                issueDiv.classList.add('border-t-4', 'border-green-500');
+            } else {
+                issueDiv.classList.add('border-t-4', 'border-purple-500');
+            }
+            issueDiv.innerHTML = `
+                <div  class="flex justify-between items-center">
+                    <img src="./assets/Open-Status.png" alt="">
+                    <span class="bg-red-200 text-red-500 px-6 py-1 rounded-2xl">${issue.priority}</span>
+                </div>
+                <h3 class="text-2xl font-semibold">${issue.title}</h3>
+                <p class="text-[#64748B]">${issue.description}</p>
+                <div class="space-x-2">${createElement(issue.labels)}</div>
+                <div class="border border-gray-100"></div>
+                <p class="text-[#64748B]">#1 by ${issue.author}</p>
+                <p class="text-[#64748B]">${new Date(issue.createdAt).toLocaleDateString('en-US')}</p>
+            `
+            issueContainer.appendChild(issueDiv);
+        }
+        hideSpinner();
+    }
+})
