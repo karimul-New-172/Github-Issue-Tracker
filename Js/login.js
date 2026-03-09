@@ -6,7 +6,7 @@ document.getElementById('btn-sign-in').addEventListener('click', function(){
     console.log(userInfo, passInfo);
 
     if(userInfo === "admin" && passInfo === "admin123"){
-        window.location.href= './index.html'
+        window.location.href= './design.html'
         
         console.log('hello');
     }else{
